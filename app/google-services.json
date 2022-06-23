@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "275746859883",
+    "project_id": "newsapp-cecdc",
+    "storage_bucket": "newsapp-cecdc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:275746859883:android:f40d4f4cd73cd4f657ba2e",
+        "android_client_info": {
+          "package_name": "com.zensarnewsapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "275746859883-iv5t0fdln6pkmpoqusk1h5mrcdpe708t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zensarnewsapp",
+            "certificate_hash": "a6a9b328490395e9cb3bf2125e0876d9c700a38a"
+          }
+        },
+        {
+          "client_id": "275746859883-u51qoaaiis6s4niqoom2oimgapbiquem.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHyzyhu9peRYDWZtb1j48FxPfMS7PIfLc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "275746859883-u51qoaaiis6s4niqoom2oimgapbiquem.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

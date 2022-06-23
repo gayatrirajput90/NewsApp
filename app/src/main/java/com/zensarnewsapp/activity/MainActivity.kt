@@ -14,6 +14,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.auth.FirebaseAuth
 import com.zensarnewsapp.R
 import com.zensarnewsapp.adapter.NewsAdapter
 import com.zensarnewsapp.apiinterface.ItemClickListener
@@ -32,12 +33,15 @@ class MainActivity : AppCompatActivity(),ItemClickListener {
     private lateinit var newsAdapter: NewsAdapter
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var editor: SharedPreferences.Editor
-    private lateinit var countryName: String
+    private  var countryName: String = "us"
+    private lateinit var name: String
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
+        auth = FirebaseAuth.getInstance()
         initialization()
         initializSharedPrefence()
         checkInternetConnectivity()
@@ -46,23 +50,32 @@ class MainActivity : AppCompatActivity(),ItemClickListener {
 
     // This function checks the internet connectivity
     fun checkInternetConnectivity() {
+            if(Utility.checkForInternet(applicationContext)){
 
-        if(Utility.checkForInternet(applicationContext)){
-            binding.progressBar.visibility = View.VISIBLE
-            getSharedPreference()
-            viewmodel.getAllNews(countryName,Constant.api_key)
-        }
-        else{
-            binding.tvNotFound.visibility = View.VISIBLE
-            binding.tvNotFound.text = "No Internet"
-        }
+                if (countryName==null) {
+                    //setSharedPreference("us")
+                    countryName = "us"
+                    viewmodel.getAllNews(countryName,Constant.api_key)
+                }
+                else {
+                    getSharedPreference()
+                    viewmodel.getAllNews(countryName,Constant.api_key)
+                }
+                binding.progressBar.visibility = View.VISIBLE
 
+            }
+            else{
+                binding.tvNotFound.visibility = View.VISIBLE
+                binding.tvNotFound.text = "No Internet"
+        }
         setObserver()
     }
 
     fun initializSharedPrefence(){
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         editor = sharedPreferences.edit()
+        name = sharedPreferences.getString(Constant.name, "").toString()
+        binding.tvName.text = "Welcome "+name
     }
 
     //This function initilizes the ViewModelFactory and adapter
@@ -99,10 +112,23 @@ class MainActivity : AppCompatActivity(),ItemClickListener {
 
     //This function select the country for fetching the news to the corresponding country
     fun setListener(){
+
         binding.rg.setOnCheckedChangeListener{ group, checkedId ->
-                val radio: RadioButton = findViewById(checkedId)
-            setSharedPreference(radio.text.toString())
+            val radio: RadioButton = findViewById(checkedId)
+
+            if(radio.text.toString().equals("USA")){
+                setSharedPreference("us")
+            } else{
+                setSharedPreference("ca")
+            }
             checkInternetConnectivity()
+        }
+
+        binding.ivLogout.setOnClickListener {
+            auth.signOut()
+            val intent = Intent(this,LoginActivity::class.java)
+            startActivity(intent)
+            finish()
         }
     }
 
@@ -113,13 +139,20 @@ class MainActivity : AppCompatActivity(),ItemClickListener {
     }
 
     fun getSharedPreference(){
-         countryName = sharedPreferences.getString(getString(R.string.country), "").toString()
+         countryName = sharedPreferences.getString(getString(R.string.country), "us").toString()
+
+        if(countryName.equals("us",true)) {
+            binding.rdUs.isChecked = true
+        }
+        else{
+            binding.rdCanada.isChecked = true
+        }
     }
 
+    //This fun is used to navigate the user to the browser for the particular news cell
     override fun onItemClickListener(url: String) {
         val openURL = Intent(Intent.ACTION_VIEW)
         openURL.data = Uri.parse(url)
         startActivity(openURL)
     }
-
 }
