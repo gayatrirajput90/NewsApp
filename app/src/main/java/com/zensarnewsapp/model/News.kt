@@ -3,7 +3,7 @@ package com.zensarnewsapp.model
 
 import com.google.gson.annotations.SerializedName
 
-data class abc(
+data class News(
     @SerializedName("articles")
     val articles: List<Article>,
     @SerializedName("status")

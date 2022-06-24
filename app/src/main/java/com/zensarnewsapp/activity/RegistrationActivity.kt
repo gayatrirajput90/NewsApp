@@ -39,6 +39,7 @@ class RegistrationActivity : AppCompatActivity() {
 
             if(Utility.checkForInternet(applicationContext)){
                 if(validate()){
+                    binding.progressbar.visibility = View.VISIBLE
                     createUserEmailAndPassword()
                 }
             } else{
