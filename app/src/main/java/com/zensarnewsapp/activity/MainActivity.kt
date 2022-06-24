@@ -8,8 +8,6 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.View
 import android.widget.RadioButton
-import android.widget.RadioGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -24,7 +22,6 @@ import com.zensarnewsapp.utility.Constant
 import com.zensarnewsapp.utility.Utility
 import com.zensarnewsapp.viewmodel.NewsViemodelfactory
 import com.zensarnewsapp.viewmodel.NewsViewmodel
-import java.util.prefs.Preferences
 
 class MainActivity : AppCompatActivity(),ItemClickListener {
 
@@ -44,6 +41,7 @@ class MainActivity : AppCompatActivity(),ItemClickListener {
         auth = FirebaseAuth.getInstance()
         initialization()
         initializSharedPrefence()
+        setUsernameToToolbar()
         checkInternetConnectivity()
         setListener()
     }
@@ -52,29 +50,32 @@ class MainActivity : AppCompatActivity(),ItemClickListener {
     fun checkInternetConnectivity() {
             if(Utility.checkForInternet(applicationContext)){
 
+                binding.progressBar.visibility = View.VISIBLE
+                binding.rvNews.visibility = View.VISIBLE
                 if (countryName==null) {
                     //setSharedPreference("us")
                     countryName = "us"
                     viewmodel.getAllNews(countryName,Constant.api_key)
-                }
-                else {
+                } else {
                     getSharedPreference()
                     viewmodel.getAllNews(countryName,Constant.api_key)
                 }
-                binding.progressBar.visibility = View.VISIBLE
-
-            }
-            else{
+                setObserver()
+            } else{
                 binding.tvNotFound.visibility = View.VISIBLE
-                binding.tvNotFound.text = "No Internet"
+                binding.tvNotFound.text = getString(R.string.not_internet)
+                binding.rvNews.visibility = View.GONE
         }
-        setObserver()
     }
 
+    //This function initializes the sharedprefrence for storing the selected country
     fun initializSharedPrefence(){
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         editor = sharedPreferences.edit()
-        name = sharedPreferences.getString(Constant.name, "").toString()
+    }
+
+    fun setUsernameToToolbar() {
+        name = Utility.getSharedPrefernce(this,Constant.name)
         binding.tvName.text = "Welcome "+name
     }
 
@@ -99,13 +100,10 @@ class MainActivity : AppCompatActivity(),ItemClickListener {
                     layoutManager = LinearLayoutManager(this@MainActivity)
                     adapter = newsAdapter
                 }
-            }
-
-            else {
+            } else {
                 binding.rvNews.visibility = View.GONE
                 binding.tvNotFound.visibility = View.VISIBLE
             }
-
             binding.progressBar.visibility = View.GONE
         })
     }
@@ -132,24 +130,25 @@ class MainActivity : AppCompatActivity(),ItemClickListener {
         }
     }
 
+    // This function set the key/value pair in shared preference
     fun setSharedPreference(country : String){
         editor.putString(getString(R.string.country),country)
         editor.apply()
         editor.commit()
     }
 
+    //This function gets the value from shared preference
     fun getSharedPreference(){
          countryName = sharedPreferences.getString(getString(R.string.country), "us").toString()
 
         if(countryName.equals("us",true)) {
             binding.rdUs.isChecked = true
-        }
-        else{
+        } else{
             binding.rdCanada.isChecked = true
         }
     }
 
-    //This fun is used to navigate the user to the browser for the particular news cell
+    //This fun is used to navigate the user to the browser when user clicks on  particular news cell
     override fun onItemClickListener(url: String) {
         val openURL = Intent(Intent.ACTION_VIEW)
         openURL.data = Uri.parse(url)

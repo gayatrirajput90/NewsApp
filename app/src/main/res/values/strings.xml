@@ -11,6 +11,19 @@
     <string name="usa">USA</string>
     <string name="canada">Canada</string>
 
+    <string name="us">us</string>
+    <string name="ca">ca</string>
+    <string name="not_internet">No Internet</string>
+
+    <string name="please_enter_name">Please enter name.</string>
+    <string name="please_enter_email">Please enter email.</string>
+
+    <string name="please_enter_valid_email">Please enter valid email.</string>
+
+    <string name="please_enter_password">Please enter password.</string>
+
+    <string name="please_enter_valid_password">Password length should be 6 or more tha 6 character.</string>
+
     <string name="please_enter_info_to_create_account">Please enter info to create account</string>
 
 

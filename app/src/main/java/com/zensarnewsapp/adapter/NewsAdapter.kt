@@ -16,8 +16,6 @@ class NewsAdapter(private val itemClickListener: ItemClickListener): RecyclerVie
     var newsList = mutableListOf<Article>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
-
-        //val inflater = LayoutInflater.from(parent.context)
         val binding = NewsRowLayoutBinding.inflate(LayoutInflater.from(parent.context),parent,false)
         return NewsViewHolder(binding)
 
@@ -25,15 +23,14 @@ class NewsAdapter(private val itemClickListener: ItemClickListener): RecyclerVie
 
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
 
-        if(newsList.get(position).title!=null && newsList.get(position).title!=null){
+        if(newsList.get(position).title!=null && newsList.get(position).title!=null) {
             holder.binding.tvText.text = newsList.get(position).title
             holder.binding.tvDescription.text = newsList.get(position).description
 
-            if(newsList.get(position).urlToImage!=null){
+            if(newsList.get(position).urlToImage!=null) {
             Glide.with(holder.itemView.context).load(newsList.get(position).urlToImage)
                 .into(holder.binding.img)
-            }
-            else{
+            } else{
                 Glide.with(holder.itemView.context).load(R.mipmap.not_found)
                     .into(holder.binding.img)
             }
@@ -43,19 +40,14 @@ class NewsAdapter(private val itemClickListener: ItemClickListener): RecyclerVie
             itemClickListener.onItemClickListener(newsList.get(position).url)
         }
     }
-
     fun setData(newsList: List<Article>){
         this.newsList = newsList.toMutableList()
         notifyDataSetChanged()
     }
-
     override fun getItemCount(): Int {
-       return 10
+       return newsList.size
     }
-
-
 }
-
 class NewsViewHolder(val binding: NewsRowLayoutBinding): RecyclerView.ViewHolder(binding.root) {
 
 }

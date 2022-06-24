@@ -1,10 +1,8 @@
 package com.zensarnewsapp.activity
 
 import android.content.Intent
-import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -13,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.zensarnewsapp.R
 import com.zensarnewsapp.databinding.ActivityRegistrationBinding
 import com.zensarnewsapp.utility.Constant
+import com.zensarnewsapp.utility.Utility
 import com.zensarnewsapp.utility.ValidateRegistration
 
 class RegistrationActivity : AppCompatActivity() {
@@ -22,45 +21,63 @@ class RegistrationActivity : AppCompatActivity() {
     private lateinit var email: String
     private lateinit var password: String
     private lateinit var name: String
-    private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var editor: SharedPreferences.Editor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_registration)
         auth = FirebaseAuth.getInstance()
-
         setClickListener()
     }
 
-    fun setClickListener(){
+    fun setClickListener() {
 
         binding.btnSignup.setOnClickListener {
             email = binding.edtEmail.text.toString()
             password = binding.edtPassword.text.toString()
             name = binding.edtName.text.toString()
 
-            if(email.length!=0 && password.length!=0 && ValidateRegistration.isValidString(email)){
-                binding.progressbar.visibility = View.VISIBLE
-                createUserEmailAndPassword()}
-            else{
-                Toast.makeText(this,"Please enter email and password",Toast.LENGTH_SHORT).show()
+            if(Utility.checkForInternet(applicationContext)){
+                if(validate()){
+                    createUserEmailAndPassword()
+                }
+            } else{
+                Toast.makeText(this,getString(R.string.not_internet),Toast.LENGTH_SHORT).show()
             }
-        }
-    }
 
-    override fun onStart() {
-        super.onStart()
-        val user = auth.currentUser
-        if(user!=null){
-            val intent = Intent(this,MainActivity::class.java)
+        }
+
+        binding.btLogin.setOnClickListener {
+            val intent = Intent(this,LoginActivity::class.java)
             startActivity(intent)
-            finish()
         }
+
     }
 
-    //This function perform firebase authentication
+    fun validate (): Boolean {
+
+        if(name.length==0){
+            Toast.makeText(this,getString(R.string.please_enter_name),Toast.LENGTH_SHORT).show()
+            return false
+        } else if (email.length==0){
+         Toast.makeText(this,getString(R.string.please_enter_email),Toast.LENGTH_SHORT).show()
+         return false
+     } else if (!ValidateRegistration.isValidString(email)){
+         Toast.makeText(this,getString(R.string.please_enter_valid_email),Toast.LENGTH_SHORT).show()
+         return false
+     } else if(password.length==0) {
+         Toast.makeText(this,getString(R.string.please_enter_password),Toast.LENGTH_SHORT).show()
+         return false
+     }else if(password.length<6){
+         Toast.makeText(this,getString(R.string.please_enter_valid_password),Toast.LENGTH_SHORT).show()
+         return false
+     }else{
+         return true
+     }
+
+    }
+
+    //This function perform firebase authentication for creating the new user
     fun createUserEmailAndPassword(){
 
         try{
@@ -68,7 +85,7 @@ class RegistrationActivity : AppCompatActivity() {
                 .addOnCompleteListener(this){ task ->
                     if(task.isSuccessful){
                         binding.progressbar.visibility = View.GONE
-                        setSharedPreference(name)
+                        Utility.setSharedPrefernce(this,Constant.name,name)
                         val intent = Intent(this,MainActivity::class.java)
                         startActivity(intent)
                     }
@@ -79,18 +96,9 @@ class RegistrationActivity : AppCompatActivity() {
                         binding.progressbar.visibility = View.GONE
                     }
                 }
-        }
-        catch (e: Exception){
+        } catch (e: Exception){
             Log.d("Auth Error","${e.message}")
         }
 
-    }
-
-    fun setSharedPreference(name : String){
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        editor = sharedPreferences.edit()
-        editor.putString(Constant.name,name)
-        editor.apply()
-        editor.commit()
     }
 }

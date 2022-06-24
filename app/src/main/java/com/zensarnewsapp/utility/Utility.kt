@@ -5,9 +5,6 @@ import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
-import android.preference.PreferenceManager
-import androidx.core.content.ContextCompat.getSystemService
-import com.zensarnewsapp.R
 
 class Utility {
 
@@ -15,6 +12,7 @@ class Utility {
 
         private lateinit var sharedPreferences: SharedPreferences
         private lateinit var editor: SharedPreferences.Editor
+
 
          fun checkForInternet(context: Context): Boolean {
 
@@ -42,21 +40,18 @@ class Utility {
             }
         }
 
-
         fun setSharedPrefernce(context: Context, key: String, value:String){
-            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+            sharedPreferences = context.getSharedPreferences("Test" , Context.MODE_PRIVATE)
             editor = sharedPreferences.edit()
             editor.putString(key,value)
             editor.apply()
             editor.commit()
-
         }
 
         fun getSharedPrefernce(context: Context,key: String) : String{
-            val data = sharedPreferences.getString("key", "").toString()
+            sharedPreferences = context.getSharedPreferences("Test" , Context.MODE_PRIVATE)
+            val data = sharedPreferences.getString(key, "").toString()
             return data
         }
     }
-
-
 }
